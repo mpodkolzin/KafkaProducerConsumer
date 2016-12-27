@@ -40,7 +40,7 @@ namespace Kafka
 
         public async Task Start()
         {
-            while(_cts.Token.IsCancellationRequested)
+            while(!_cts.Token.IsCancellationRequested)
             {
                 foreach (var message in _consumer.Consume())
                 {
