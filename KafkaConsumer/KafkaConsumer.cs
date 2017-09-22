@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
+using Kafka.CLI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,8 +41,12 @@ namespace Kafka
             {
                 { "group.id",  "test-consumer" },
                 { "bootstrap.servers", brokerList }
-
             };
+        }
+
+        public KafkaConsumer(CommandLineOptions options)
+        {
+
         }
 
         public void Stop()

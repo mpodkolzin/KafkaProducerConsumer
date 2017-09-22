@@ -56,7 +56,6 @@
   <ItemGroup>
     <Compile Include="CLI\CommandLineOptions.cs" />
     <Compile Include="KafkaConsumer.cs" />
-    <Compile Include="KafkaProducer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Kafka
 {
-    //WORK IN PROGRESS
+    //WORK IN PROGRESS DO NOT USE
+    [Obsolete("Please do not use this class")]
     public class KafkaProducer
     {
 

@@ -1,5 +1,8 @@
-Kafka/bin
-Kafka/obj
+KafkaConsumer/bin
+KafkaConsumer/obj
+
+KafkaProducer/bin
+KafkaProducer/obj
 
 .vs/
 

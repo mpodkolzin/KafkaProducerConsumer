@@ -17,13 +17,5 @@ namespace Kafka.CLI
             HelpText = "Kafka topic")]
         public string Topic { get; set; }
 
-        [Option('o', "offset", Required = false,
-            HelpText = "Topic offset")]
-        public long Offset { get; set; } = 0;
-
-        [Option('f', "from-beginning", Required = false,
-            HelpText = "Start consuming from offset 0")]
-        public bool FromBeginning { get; set; }
-
     }
 }
