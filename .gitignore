@@ -1,2 +1,8 @@
-./Kafka/bin
-./Kafka/obj
+Kafka/bin
+Kafka/obj
+
+.vs/
+
+packages
+
+

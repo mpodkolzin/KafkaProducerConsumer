@@ -1,6 +1,5 @@
-﻿using KafkaNet;
-using KafkaNet.Common;
-using KafkaNet.Model;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +11,21 @@ namespace Kafka
 {
     public class KafkaConsumer
     {
-        private KafkaOptions _options;
-        private BrokerRouter _router;
-        private Consumer _consumer;
+        private int _receiveTimeout = 3; //receive timeout in seconds
+        private Consumer<Null, string> _consumer;
+        private Dictionary<string, object> _config;
+        private int _delay;
+        private long _offset;
+       
+
 
         private CancellationTokenSource _cts = new CancellationTokenSource();
+        string _topic;
 
-        public KafkaConsumer(string url, string topic, int delay=2000)
+
+        public KafkaConsumer(List<string> brokerList, string topic, long offset = 0, int delay=2000)
         {
-            if(string.IsNullOrEmpty(url))
+            if(brokerList == null || !brokerList.Any())
             {
                 throw new ArgumentNullException("Url cannot be null");
             }
@@ -28,9 +33,15 @@ namespace Kafka
             {
                 throw new ArgumentNullException("topic cannot be null");
             }
-            _options = new KafkaOptions(new Uri(url));
-            _router = new BrokerRouter(_options);
-            _consumer = new Consumer(new ConsumerOptions(topic, _router));
+            _offset = offset;
+            _delay = delay;
+            _topic = topic;
+            _config = new Dictionary<string, object>
+            {
+                { "group.id",  "test-consumer" },
+                { "bootstrap.servers", brokerList }
+
+            };
         }
 
         public void Stop()
@@ -40,15 +51,19 @@ namespace Kafka
 
         public async Task Start()
         {
-            while(!_cts.Token.IsCancellationRequested)
+            using (_consumer = new Consumer<Null, string>(_config, null, new StringDeserializer(Encoding.UTF8)))
+
+            _consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset(_topic, 0, _offset) });
+            while (!_cts.Token.IsCancellationRequested)
             {
-                foreach (var message in _consumer.Consume())
+                Message<Null, string> msg;
+                if(_consumer.Consume(out msg, TimeSpan.FromSeconds(_receiveTimeout)))
                 {
-                    Console.WriteLine("Response: P{0},O{1} : {2}", 
-                        message.Meta.PartitionId, message.Meta.Offset, message.Value.ToUtf8String());  
+                    Console.WriteLine($"{msg.Timestamp}: Received:: topic: [{msg.Topic}], Partition: [{msg.Partition}], {msg.Value}");
+
                 }
 
-                await Task.Delay(2000);
+                await Task.Delay(_delay);
             }
         }
     }

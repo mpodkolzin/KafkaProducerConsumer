@@ -4,23 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Kafka;
-using KafkaNet.Common;
-using KafkaNet.Model;
-using KafkaNet;
+using CommandLine;
+using Kafka.CLI;
 
 namespace Kafka
 {
     class Program
     {
-        const string url = "http://10.4.200.9:32768";
+        const string url = "10.4.200.9:32768";
         const string topic = "TestOS_2";
         static void Main(string[] args)
         {
-            //Uncomment it if you need producer as well
-            //var producer = new KafkaProducer(url, topic);
-            //producer.Start();
+            var options = new CommandLineOptions();
 
-            var consumer = new KafkaConsumer(url, topic);
+            Parser.Default.ParseArgumentsStrict(args, options);
+
+            var consumer = new KafkaConsumer(options.BrokerList.ToList(), options.Topic, options.Offset);
             consumer.Start();
 
             Console.ReadLine();
