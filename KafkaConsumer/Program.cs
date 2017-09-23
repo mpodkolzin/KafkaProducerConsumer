@@ -20,10 +20,8 @@ namespace Kafka
             Parser.Default.ParseArgumentsStrict(args, options);
 
             var consumer = new KafkaConsumer(options.BrokerList.ToList(), options.Topic, options.Offset);
-            consumer.Start();
-
-            Console.ReadLine();
-
+            Console.ReadKey();
+            consumer.Stop();
         }
     }
 }

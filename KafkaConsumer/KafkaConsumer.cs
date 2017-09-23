@@ -28,19 +28,24 @@ namespace Kafka
         {
             if(brokerList == null || !brokerList.Any())
             {
-                throw new ArgumentNullException("Url cannot be null");
+                throw new ArgumentNullException(nameof(brokerList));
             }
             if(string.IsNullOrEmpty(topic))
             {
-                throw new ArgumentNullException("topic cannot be null");
+                throw new ArgumentNullException(nameof(topic));
             }
             _offset = offset;
             _delay = delay;
             _topic = topic;
             _config = new Dictionary<string, object>
             {
-                { "group.id",  "test-consumer" },
-                { "bootstrap.servers", brokerList }
+                { "group.id", "simple-csharp-consumer" },
+                { "bootstrap.servers", brokerList.Aggregate("",(list, srv) => list + " " + srv)},
+                { "default.topic.config", new Dictionary<string, object>
+                    {
+                        { "acks", "all" }
+                    }
+                }
             };
         }
 
@@ -57,19 +62,28 @@ namespace Kafka
         public async Task Start()
         {
             using (_consumer = new Consumer<Null, string>(_config, null, new StringDeserializer(Encoding.UTF8)))
-
-            _consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset(_topic, 0, _offset) });
-            while (!_cts.Token.IsCancellationRequested)
             {
-                Message<Null, string> msg;
-                if(_consumer.Consume(out msg, TimeSpan.FromSeconds(_receiveTimeout)))
-                {
-                    Console.WriteLine($"{msg.Timestamp}: Received:: topic: [{msg.Topic}], Partition: [{msg.Partition}], {msg.Value}");
+                _consumer.Assign(new List<TopicPartitionOffset> { new TopicPartitionOffset(_topic, 0, _offset) });
+                _consumer.OnLog += (e, a) => {
 
+                    Console.WriteLine("Error");
+
+                };
+                var metadata = _consumer.GetMetadata(true);
+                while (!_cts.Token.IsCancellationRequested)
+                {
+                    Message<Null, string> msg;
+                    if(_consumer.Consume(out msg, TimeSpan.FromSeconds(_receiveTimeout)))
+                    {
+                        Console.WriteLine($"{msg.Timestamp.UtcDateTime}: Received:: topic: [{msg.Topic}], Partition: [{msg.Partition}], {msg.Value}");
+
+                    }
+
+                    await Task.Delay(_delay);
                 }
 
-                await Task.Delay(_delay);
             }
+
         }
     }
 }
