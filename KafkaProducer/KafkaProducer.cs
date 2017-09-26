@@ -16,8 +16,6 @@ namespace KafkaProducer
         private Dictionary<string, object> _config;
         private int _delay;
 
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-
         public KafkaProducer(List<string> brokerList, string topic, int delay = 2000)
         {
             if (brokerList == null || !brokerList.Any())

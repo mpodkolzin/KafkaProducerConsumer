@@ -11,8 +11,6 @@ namespace Kafka
 {
     class Program
     {
-        const string url = "10.4.200.9:32768";
-        const string topic = "TestOS_2";
         static void Main(string[] args)
         {
             var options = new CommandLineOptions();
@@ -20,6 +18,7 @@ namespace Kafka
             Parser.Default.ParseArgumentsStrict(args, options);
 
             var consumer = new KafkaConsumer(options.BrokerList.ToList(), options.Topic, options.Offset);
+            consumer.Start();
             Console.ReadKey();
             consumer.Stop();
         }
